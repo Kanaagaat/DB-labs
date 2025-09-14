@@ -1,0 +1,37 @@
+part 1
+SSAAMPLE DATAA: Employee(EmpID, SSN, Email, Phone, Name, Department, Salary)
+
+task - 1
+1.superkeys: (EmpID),(SSN),(Email),(Phone),(EmpID,Email),(SSN,Name),(EmpID, Department)
+superkey - any combinaation of atributes that uniquely iddentifiees each tuple
+2.candidatekey: (EmpID),(SSN),(Email)
+3.EmpId can be primary key because it has uniqe value and can be indentified in rrelation 
+4.It can be due to human mistake. For that reason itt can not be pk
+
+task-2
+
+Registration(StudentID, CourseCode, Section, Semester, Year, Grade, Credits)
+
+1.pk = (StudentID, CourseCode, Section, Semester, Year)
+2.  StudentID - to determine which student is 
+    CourseCode - to determine which courrse is taken
+    section - same course may multiple section in the same ssemestr
+    year - identify academic year
+    semester - identify academic Year
+3.No additional candidate key
+
+part 1.2
+task - 1
+Given Tables:
+Student(StudentID, Name, Email, Major, AdvisorID) 
+Professor(ProfID, Name, Department, Salary) 
+Course(CourseID, Title, Credits, DepartmentCode) 
+Department(DeptCode, DeptName, Budget, ChairID) 
+Enrollment(StudentID, CourseID, Semester, Grade)
+
+Your Tasks: 1. Identify all foreign key relationships
+FK  =   (StudentID,CourseID) -> enrollment
+        (AdvisorID) -> ProfID -> Professor
+        (proffesor.deparrtmennt) - > deptkey
+        course.DepartmentCode -> departmennt
+

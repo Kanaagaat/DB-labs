@@ -1,0 +1,53 @@
+Task-1
+1.  strong entity -> patients, doctors, departments
+    weak entity -> hospital rooms, apointments, prescroption
+2.
+    patient -> {
+        patientId - PK simple,
+        names - simple,
+        birtdates - simple,
+        adresses - composite,
+        phone-number - multi-valued,
+        insuranceInfo - simple
+
+    }
+    doctor -> {
+        doctorID - PK, simple,
+        names - simple,
+        specialazation - multi-valued,
+        phone-number - simple,
+        office-location - simple
+    }
+    department -> {
+        departmentCode - pk, simple,
+        names  - simple,
+        locaations = simple
+    }
+    appointment -> {
+        apointmentId -> composite PK, 
+        dateTime - simple, 
+        purposse - simple,
+        notes - simple
+    }
+    prescription -> {
+        prescrrpID - pk , simple,
+        medication  - simple,
+        dosage - simple,
+        instructions - simple
+
+    }
+    room -> {
+        room-numbeer - simple
+        deptId - pm, fk simple
+    }
+3.  Patient–Phone: 1:N (one pattient can have many phones)
+    Doctor–Phone: 1:N (one doctor can have many phones)
+    Doctor–Specialization: 1:N (one doctor can have multiple specializations)
+    Department–Doctor: 1:N (a deparrtment has many doctors, each doctor belongs to one dept)
+    Department–Room: 1:N (each deppartment has multiple rooms, room belongs to exactly one dept)
+    Patient–Appointment–Doctor: M:N resolved via Appointment entity
+    Patient (1:N) Appointment (N:1) Doctor
+    Doctor–Prescription–Patient: M:N resolved via Prescription entity
+    Doctor (1:N) Prescription (N:1) Patient
+4.
+    
