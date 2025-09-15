@@ -1,0 +1,27 @@
+2.
+    Student(StudentID PK, Name, Major, Email)
+    Club(ClubID PK, Name, Budget, FacultyID FK→FacultyAdvisor.FacultyID)
+    FacultyAdvisor(FacultyID PK, Name, Department)
+    Membership(StudentID FK→Student, ClubID FK→Club, JoinDate, MembershipStatus,
+    PK = (StudentID, ClubID))
+    OfficerPosition(StudentID FK→Student, ClubID FK→Club, Position, StartDate, EndDate,
+    PK = (StudentID, ClubID, Position))
+    Room(RoomID PK, Building, Capacity)
+    Event(EventID PK, ClubID FK→Club, RoomID FK→Room, Date, StartTime, EndTime)
+    EventAttendance(StudentID FK→Student, EventID FK→Event,
+    PK = (StudentID, EventID))
+    Expense(ExpenseID PK, EventID FK→Event, Amount, Description, Date)
+
+3.
+    1->Create a separate table Advises that connects FacultyAdvisor and Club.
+    2->Put the advisor’s ID directly inside the Club table as a foreign key.
+    My choice:
+        I put FacultyID as a foreign key in the Club table, because every club 
+        can have only one advisor. This keeps the design simpler—just one column 
+        instead of an extra relationship table—and it still satisfies all the requirements.
+
+
+4.
+    Find all students who are officers in the Computer Science Club.
+    List all upcoming events, including the club name and the room where each event is scheduled.
+    Show the total expenses for each club for the current academic year.
