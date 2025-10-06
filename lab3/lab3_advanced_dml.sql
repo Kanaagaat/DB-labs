@@ -165,4 +165,18 @@
 
 
 
+-- test
 
+    INSERT INTO employees(first_name, last_name, department)
+    SELECT 'Alice','Brown','IT'
+    WHERE NOT EXISTS (SELECT 1 FROM employees WHERE first_name = 'Alice' and last_name = 'Brown');
+
+
+    UPDATE employees
+    SET salary = salary * 1.15,
+        status = 'Promoted'
+    WHERE department = 'sales'
+
+    DELETE FROM departments d
+    WHERE  (SELECT * FROM employees d
+                     WHERE D)
