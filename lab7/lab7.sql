@@ -152,6 +152,174 @@ REFRESH MATERIALIZED VIEW dept_summary_mv;
 
 -- 4) Query materialized view AFTER refresh
 SELECT * FROM dept_summary_mv WHERE dept_id = 101;
+-- we before rrefresh we see old data withoutcharlie, after we can see differnece in valuee
 -- 5.3
+create unique index on dept_summary_mv(dept_id);
+refresh materialized view concurrently dept_summary_mv;
+
+select * from dept_summary_mv;
+-- we can read data while it is updating
+-- 5.4
+create materialized view project_stats_mv as
+    select p.project_name, p.budget,d.dept_name, count(e.emp_id) as assigned_emp
+    from projects p
+    left join departments d on p.dept_id = d.dept_id
+    left join employees e on p.dept_id = e.dept_id
+    group by p.project_name, p.budget, d.dept_name
+    with no data;
+
+select * from project_stats_mv;
+-- it gives errrror because we didnt write refresh and added data into ito it
+-- part 6
+create role analyst;
+create role data_viewer login password 'viewer123';
+create role report_use login password 'report456';
+SELECT rolname FROM pg_roles WHERE rolname NOT LIKE 'pg_%';
+-- 6.2
+create role db_creator login password 'creator789' createdb ;
+create role user_manager login password 'manager101' createrole ;
+create role admin_user login password 'admin99' superuser;
+-- 6.3
+grant select on employees, departments,projects to analyst;
+grant all privileges  on part2_view to data_viewer;
+grant select,insert on employees to report_use;
+-- 6.4
+create role hr_team;
+create role finance_team;
+create role it_team;
+
+create role hr_user1 login password 'hr001';
+create role hr_user2 login password 'hr002';
+create role finance_user1 login password 'fin001';
+
+grant hr_team to hr_user1;
+grant hr_team to hr_user2;
+grant finance_team to finance_user1;
+
+grant select, update on employees to hr_team;
+grant select on part2_view to finance_team;
+-- 6.5
+revoke update on employees from hr_team;
+revoke hr_team from hr_user2;
+revoke all privileges on part2_view from data_viewer;
+-- 6.6
+alter role analyst login password 'analyst123';
+alter role user_manager superuser;
+alter role analyst password  null;
+alter role data_viewer connection limit 5;
+
+-- part 7
+create role read_only;
+grant select on all tables in schema public to read_only;
+alter default privileges in schema public
+grant select on tables to read_only;
+
+create role junior_analyst login password 'junior123';
+create role senior_analyst login password 'senior123';
+
+grant read_only to junior_analyst;
+grant read_only to senior_analyst;
+
+grant insert, update on employees to senior_analyst;
+
+-- 7.2
+create role project_manager login password 'pm123';
+alter view dept_statistics owner to project_manager;
+alter table projects owner to project_manager;
+
+
+SELECT tablename, tableowner FROM pg_tables
+WHERE schemaname = 'public';
+-- 7.3
+create role temp_owner login;
+
+create table temp_table(id int);
+alter table temp_table owner to temp_owner;
+
+reassign owned by temp_owner to postgres;
+drop owned by temp_owner;
+drop role temp_owner;
+
+-- 7.4
+create or replace view hr_employee_view as
+    select * from employees where dept_id = 102;
+grant select on hr_employee_view to hr_team;
+
+create or replace view finance_employee_view as
+    select emp_id, emp_name, salary from employees;
+grant select on finance_employee_view to finance_team;
+
+-- part 8
+create or replace view dept_dashboard as
+    select
+        d.dept_name, d.location,
+        count(distinct e.emp_id) as employee_count,
+        round(avg(e.salary), 2) as avg_salary,
+        count(distinct p.project_id) as active_projects,
+        sum(distinct  p.budget) as total_budget,
+        ROUND(
+            COALESCE(SUM(p.budget), 0) /
+            NULLIF(COUNT(DISTINCT e.emp_id), 0), 2
+        ) AS budget_per_employee
+    from departments d
+    left join projects p on d.dept_id = p.dept_id
+    left join employees e on d.dept_id = e.dept_id
+    group by d.dept_name, d.location
+    order by d.dept_name;
+
+select * from dept_dashboard;
+-- 8.2
+alter table projects
+add column create_date timestamp default current_timestamp;
+
+create or replace view high_budget_projects as
+    select
+        p.project_name,
+        p.budget,
+        d.dept_name,
+        p.create_date,
+        case
+            when p.budget > 150000 then 'critical review required'
+            when p.budget > 100000 then 'Management approval needed'
+            else 'Standard Process'
+        end as approval_satatus
+        from projects p
+        left join departments d on d.dept_id = p.dept_id
+        where budget > 75000
+        order by p.budget desc;
+
+select * from high_budget_projects;
+
+-- 8.3
+create role viewer_role;
+grant select on all tables in schema public to viewer_role;
+grant select on all sequences in schema public to viewer_role;
+
+create role entry_role;
+grant viewer_role to entry_role;
+grant insert on employees to entry_role;
+grant insert on projects to entry_role;
+
+CREATE ROLE analyst_role;
+GRANT entry_role TO analyst_role;
+
+-- Разрешаем обновление данных
+GRANT UPDATE ON employees, projects TO analyst_role;
+
+CREATE ROLE manager_role;
+GRANT analyst_role TO manager_role;
+
+-- Разрешаем удаление данных
+GRANT DELETE ON employees, projects TO manager_role;
+
+-- Создаем пользователей
+CREATE USER alice PASSWORD 'alice123';
+CREATE USER bob PASSWORD 'bob123';
+CREATE USER charlie PASSWORD 'charlie123';
+
+-- Назначаем им роли
+GRANT viewer_role TO alice;
+GRANT analyst_role TO bob;
+GRANT manager_role TO charlie;
 
 
